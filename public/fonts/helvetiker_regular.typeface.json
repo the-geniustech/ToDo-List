@@ -1,0 +1,51 @@
+{
+  "glyphs": {
+    "0": {
+      "ha": 556,
+      "x_min": 37,
+      "x_max": 519,
+      "o": "m 519 278 q 519 181 519 228 q 519 108 519 134 q 480 30 519 63 q 421 -10 442 -3 q 361 -20 400 -17 q 278 -20 322 -20 q 195 -20 234 -20 q 135 -10 156 -20 q 76 30 114 -3 q 37 108 37 63 q 37 181 37 134 q 37 278 37 228 q 37 375 37 322 q 37 448 37 422 q 76 526 37 493 q 135 566 114 559 q 195 576 156 573 q 278 576 234 576 q 361 576 322 576 q 421 566 400 576 q 480 526 442 556 q 519 448 519 496 q 519 375 519 422 q 519 278 519 328 m 426 278 q 426 346 426 312 q 426 399 426 373 q 407 439 426 420 q 375 458 388 458 q 329 458 362 458 q 278 458 296 458 q 227 458 260 458 q 181 458 194 458 q 149 439 168 458 q 130 399 130 420 q 130 346 130 373 q 130 278 130 312 q 130 210 130 244 q 130 157 130 183 q 149 117 130 136 q 181 98 168 98 q 227 98 194 98 q 278 98 260 98 q 329 98 296 98 q 375 98 362 98 q 407 117 388 98 q 426 157 426 136 q 426 210 426 183 q 426 278 426 244 z"
+    },
+    "1": {
+      "ha": 556,
+      "x_min": 87,
+      "x_max": 470,
+      "o": "m 470 0 l 373 0 l 373 448 q 373 478 373 463 q 373 496 373 486 q 330 452 356 485 q 298 423 304 419 q 231 369 284 411 l 175 322 l 175 322 q 124 278 149 300 q 87 239 99 256 l 175 322 q 230 369 202 345 q 298 423 258 393 q 330 452 304 419 q 373 496 356 485 q 373 478 373 486 q 373 463 373 478 l 373 448 l 373 0 l 470 0 z"
+    }
+  },
+  "familyName": "Helvetiker",
+  "ascender": 718,
+  "descender": -207,
+  "underlinePosition": -125,
+  "underlineThickness": 50,
+  "boundingBox": {
+    "yMin": -207,
+    "xMin": -166,
+    "yMax": 718,
+    "xMax": 1000
+  },
+  "resolution": 1000,
+  "original_font_information": {
+    "format": 0,
+    "copyright": "",
+    "fontFamily": "Helvetiker",
+    "fontSubfamily": "Regular",
+    "uniqueID": "",
+    "fullName": "Helvetiker",
+    "version": "",
+    "postScriptName": "Helvetiker",
+    "trademark": "",
+    "manufacturer": "",
+    "designer": "",
+    "description": "",
+    "manufacturerURL": "",
+    "designerURL": "",
+    "license": "",
+    "licenseURL": "",
+    "reserved": "",
+    "preferredFamily": "",
+    "preferredSubfamily": "",
+    "compatibleFullName": "",
+    "sampleText": ""
+  }
+}

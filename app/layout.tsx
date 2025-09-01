@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { TeamProvider } from "@/components/TeamContext";
+import { TaskProvider } from "@/components/TaskContext";
+import { MainSidebar } from "@/components/MainSidebar";
+import { ThemeDebug } from "@/components/ThemeDebug";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +33,37 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <ErrorBoundary
+          fallback={
+            <div className="flex justify-center items-center bg-background h-screen text-foreground">
+              <div className="text-center">
+                <div className="mb-4 text-destructive text-6xl">⚠️</div>
+                <h1 className="mb-2 font-bold text-2xl">Application Error</h1>
+                <p className="text-muted-foreground">
+                  Please refresh the page to try again.
+                </p>
+              </div>
+            </div>
+          }
+        >
+          <ThemeProvider defaultTheme="system">
+            <TeamProvider>
+              <TaskProvider>
+                <div className="flex bg-background max-w-screen h-screen overflow-hidden text-foreground">
+                  {/* Main Sidebar */}
+                  <div className="hidden md:block">
+                    <MainSidebar />
+                  </div>
+
+                  {children}
+                </div>
+
+                {/* Theme Debug Component (development only) */}
+                {/* <ThemeDebug /> */}
+              </TaskProvider>
+            </TeamProvider>
+          </ThemeProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );
