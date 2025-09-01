@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import svgPaths from "../imports/svg-v4vk5tlnq6";
+import { usePathname, useRouter } from "next/navigation";
 
 // Logout Icon
 function LogoutIcon() {
@@ -201,7 +202,7 @@ function TrafficLights() {
 interface NavItemProps {
   icon: React.ReactNode;
   isActive?: boolean;
-  onClick?: () => void;
+  onClick: () => void;
   tooltip?: string;
 }
 
@@ -234,18 +235,50 @@ function NavItem({ icon, isActive = false, onClick, tooltip }: NavItemProps) {
   );
 }
 
-export function MainSidebar() {
-  const [activeItem, setActiveItem] = useState("dashboard");
+const navigationItems = [
+  {
+    id: "dashboard",
+    icon: <DashboardIcon />,
+    tooltip: "Dashboard",
+    link: "/",
+  },
+  {
+    id: "profile",
+    icon: <ProfileIcon />,
+    tooltip: "Profile",
+    link: "/profile",
+  },
+  {
+    id: "calendar",
+    icon: <CalendarIcon />,
+    tooltip: "Calendar",
+    link: "/calendar",
+  },
+  {
+    id: "analytics",
+    icon: <AnalyticsIcon />,
+    tooltip: "Analytics",
+    link: "/analytics",
+  },
+  {
+    id: "cloud",
+    icon: <CloudIcon />,
+    tooltip: "Cloud Storage",
+    link: "/cloud",
+  },
+  { id: "map", icon: <MapIcon />, tooltip: "Map", link: "/map" },
+  {
+    id: "settings",
+    icon: <SettingsIcon />,
+    tooltip: "Settings",
+    link: "/settings",
+  },
+];
 
-  const navigationItems = [
-    { id: "dashboard", icon: <DashboardIcon />, tooltip: "Dashboard" },
-    { id: "profile", icon: <ProfileIcon />, tooltip: "Profile" },
-    { id: "calendar", icon: <CalendarIcon />, tooltip: "Calendar" },
-    { id: "analytics", icon: <AnalyticsIcon />, tooltip: "Analytics" },
-    { id: "cloud", icon: <CloudIcon />, tooltip: "Cloud Storage" },
-    { id: "map", icon: <MapIcon />, tooltip: "Map" },
-    { id: "settings", icon: <SettingsIcon />, tooltip: "Settings" },
-  ];
+export function MainSidebar() {
+  // const [activeItem, setActiveItem] = useState("dashboard");
+  const pathName = usePathname();
+  const route = useRouter();
 
   return (
     <div className="relative flex flex-col bg-[#1c1d22] w-[90px] h-screen">
@@ -261,15 +294,31 @@ export function MainSidebar() {
 
       {/* Navigation Items */}
       <div className="flex flex-col flex-1 justify-start space-y-2 px-4 pt-8">
-        {navigationItems.map((item) => (
-          <NavItem
-            key={item.id}
-            icon={item.icon}
-            isActive={activeItem === item.id}
-            onClick={() => setActiveItem(item.id)}
-            tooltip={item.tooltip}
-          />
-        ))}
+        {navigationItems.map((item) => {
+          console.log(
+            "pathName.includes(item.id) || pathName === '/'",
+            pathName.includes(item.id) || pathName === "/"
+          );
+
+          console.log("pathName === '/'", pathName === "/");
+          console.log("pathName.includes(item.id)", pathName.includes(item.id));
+          console.log("pathName", pathName);
+          console.log("item.id", item.id);
+
+          return (
+            <NavItem
+              key={item.id}
+              icon={item.icon}
+              isActive={
+                pathName.startsWith(`/${item.id}`) ||
+                (pathName === "/" && item.id === "dashboard")
+              }
+              // isActive={activeItem === item.id}
+              onClick={() => route.push(item.link)}
+              tooltip={item.tooltip}
+            />
+          );
+        })}
       </div>
 
       {/* Logout Button */}

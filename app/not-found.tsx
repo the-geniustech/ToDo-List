@@ -1,6 +1,6 @@
 import React from "react";
-import NotFoundPage from "@/components/NotFoundPage";
+import { InteractiveNotFound } from "@/components/InteractiveNotFound";
 
-const NotFound: React.FC = () => <NotFoundPage />;
+const NotFound: React.FC = () => <InteractiveNotFound />;
 
 export default NotFound;

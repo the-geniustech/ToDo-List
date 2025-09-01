@@ -2,14 +2,14 @@
 
 import React, { Suspense, useRef, useState, useCallback } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Stars, Float, Environment, Html } from "@react-three/drei";
+import { Stars, Float, Environment } from "@react-three/drei";
 import * as THREE from "three";
 import { motion } from "motion/react";
 import { useTheme } from "./ThemeProvider";
 import { Button } from "./ui/button";
 import { Home, ArrowLeft, RotateCcw } from "lucide-react";
 
-// Interactive 3D Objects that respond to mouse
+/* ------------------ InteractiveObject ------------------ */
 const InteractiveObject: React.FC<{
   position: [number, number, number];
   color: string;
@@ -25,7 +25,6 @@ const InteractiveObject: React.FC<{
       meshRef.current.rotation.x = Math.sin(time) * 0.3;
       meshRef.current.rotation.y = Math.cos(time) * 0.5;
 
-      // Scale based on hover state
       const targetScale = hovered ? 1.2 : clicked ? 0.8 : 1;
       meshRef.current.scale.lerp(
         new THREE.Vector3(targetScale, targetScale, targetScale),
@@ -45,41 +44,47 @@ const InteractiveObject: React.FC<{
       <mesh
         ref={meshRef}
         position={position}
-        onPointerOver={() => setHovered(true)}
-        onPointerOut={() => setHovered(false)}
-        onClick={handleClick}
+        onPointerOver={(e) => {
+          e.stopPropagation();
+          setHovered(true);
+        }}
+        onPointerOut={(e) => {
+          e.stopPropagation();
+          setHovered(false);
+        }}
+        onPointerDown={(e) => {
+          e.stopPropagation();
+          handleClick();
+        }}
+        onClick={(e) => e.stopPropagation()}
       >
         <dodecahedronGeometry args={[1]} />
         <meshStandardMaterial
           color={color}
           emissive={color}
-          emissiveIntensity={hovered ? 0.3 : 0.1}
+          emissiveIntensity={hovered ? 0.35 : 0.12}
           transparent
-          opacity={hovered ? 0.9 : 0.7}
+          opacity={hovered ? 0.95 : 0.8}
           roughness={0.2}
-          metalness={0.8}
+          metalness={0.85}
         />
       </mesh>
     </Float>
   );
 };
 
-// Mouse-following particle system
+/* ------------------ MouseParticles ------------------ */
 const MouseParticles: React.FC = () => {
   const { mouse, viewport } = useThree();
   const pointsRef = useRef<THREE.Points>(null);
-  // const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   useFrame(() => {
     if (pointsRef.current) {
       const x = (mouse.x * viewport.width) / 2;
       const y = (mouse.y * viewport.height) / 2;
-
-      // setMousePosition({ x, y });
-
-      // Update particle positions to follow mouse
       const positions = pointsRef.current.geometry.attributes.position
         .array as Float32Array;
+
       for (let i = 0; i < positions.length; i += 3) {
         const dx = x - positions[i];
         const dy = y - positions[i + 1];
@@ -92,13 +97,13 @@ const MouseParticles: React.FC = () => {
 
   const particleCount = 100;
   const positions = React.useMemo(() => {
-    const positions = new Float32Array(particleCount * 3);
+    const arr = new Float32Array(particleCount * 3);
     for (let i = 0; i < particleCount; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 20;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 20;
+      arr[i * 3] = (Math.random() - 0.5) * 20;
+      arr[i * 3 + 1] = (Math.random() - 0.5) * 20;
+      arr[i * 3 + 2] = (Math.random() - 0.5) * 20;
     }
-    return positions;
+    return arr;
   }, []);
 
   return (
@@ -106,8 +111,8 @@ const MouseParticles: React.FC = () => {
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
-          count={particleCount}
           array={positions}
+          count={particleCount}
           itemSize={3}
           args={[positions, 3]}
         />
@@ -123,22 +128,20 @@ const MouseParticles: React.FC = () => {
   );
 };
 
-// Dynamic background that changes with mouse movement
+/* ------------------ DynamicBackground ------------------ */
 const DynamicBackground: React.FC = () => {
   const { mouse } = useThree();
   const backgroundRef = useRef<THREE.Mesh>(null);
 
   useFrame(() => {
     if (backgroundRef.current) {
-      // Change background color based on mouse position
-      const hue = (mouse.x + 1) * 180; // Map mouse.x from [-1,1] to [0,360]
-      const saturation = (mouse.y + 1) * 30 + 20; // Map mouse.y to [20,80]
-      const lightness = 10; // Keep it dark
-
+      const hue = (mouse.x + 1) * 0.45;
+      const saturation = (mouse.y + 1) * 0.25 + 0.3;
+      const lightness = 0.07;
       (backgroundRef.current.material as THREE.MeshBasicMaterial).color.setHSL(
-        hue / 360,
-        saturation / 100,
-        lightness / 100
+        hue,
+        saturation,
+        lightness
       );
     }
   });
@@ -146,35 +149,42 @@ const DynamicBackground: React.FC = () => {
   return (
     <mesh ref={backgroundRef} position={[0, 0, -50]}>
       <planeGeometry args={[200, 200]} />
-      <meshBasicMaterial transparent opacity={0.1} />
+      <meshBasicMaterial transparent opacity={0.15} />
     </mesh>
   );
 };
 
-// Interactive 3D Scene
+/* ------------------ InteractiveScene ------------------ */
 const InteractiveScene: React.FC<{
   onObjectClick: (message: string) => void;
 }> = ({ onObjectClick }) => {
   const { theme } = useTheme();
 
   const objects = [
-    { position: [-4, 2, 0], color: "#EF4444", message: "Red energy detected!" },
+    {
+      position: [-4, 2, 0],
+      color: "#EF4444",
+      message: "Lost page clue unlocked!",
+    },
     {
       position: [4, -1, 2],
       color: "#10B981",
-      message: "Green power activated!",
+      message: "You discovered a hidden fragment!",
     },
     {
       position: [-2, -3, 1],
       color: "#8B5CF6",
-      message: "Purple magic unleashed!",
+      message: "A secret pathway reveals itself...",
     },
-    { position: [3, 3, -1], color: "#F59E0B", message: "Golden light shines!" },
+    {
+      position: [3, 3, -1],
+      color: "#F59E0B",
+      message: "Golden portal piece acquired!",
+    },
   ] as const;
 
   return (
     <>
-      {/* Lighting */}
       <ambientLight intensity={theme === "dark" ? 0.4 : 0.6} />
       <directionalLight
         position={[10, 10, 5]}
@@ -182,15 +192,11 @@ const InteractiveScene: React.FC<{
         color={theme === "dark" ? "#60A5FA" : "#FFFFFF"}
       />
       <pointLight position={[-10, -10, -5]} intensity={0.6} color="#A855F7" />
-
-      {/* Environment */}
       <Environment preset={theme === "dark" ? "night" : "dawn"} />
-
-      {/* Background Elements */}
       <Stars
         radius={300}
         depth={60}
-        count={3000}
+        count={1200}
         factor={4}
         saturation={0}
         fade
@@ -198,8 +204,6 @@ const InteractiveScene: React.FC<{
       />
       <DynamicBackground />
       <MouseParticles />
-
-      {/* Interactive Objects */}
       {objects.map((obj, index) => (
         <InteractiveObject
           key={index}
@@ -208,25 +212,11 @@ const InteractiveScene: React.FC<{
           onClick={() => onObjectClick(obj.message)}
         />
       ))}
-
-      {/* Floating HTML Elements */}
-      <Html position={[0, 4, 0]} center>
-        <div className="text-center pointer-events-none">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, delay: 0.5 }}
-            className="bg-black/20 backdrop-blur-sm px-4 py-2 rounded-lg font-medium text-white text-lg"
-          >
-            Click the floating objects!
-          </motion.div>
-        </div>
-      </Html>
     </>
   );
 };
 
-// Main Interactive 404 Component
+/* ------------------ Main Component ------------------ */
 interface InteractiveNotFoundProps {
   onGoHome?: () => void;
   onGoBack?: () => void;
@@ -246,29 +236,27 @@ export const InteractiveNotFound: React.FC<InteractiveNotFoundProps> = ({
   }, []);
 
   const handleGoHome = () => {
-    if (onGoHome) {
-      onGoHome();
-    } else {
-      window.location.href = "/";
-    }
+    if (onGoHome) onGoHome();
+    else window.location.href = "/";
   };
 
   const handleGoBack = () => {
-    if (onGoBack) {
-      onGoBack();
-    } else {
-      window.history.back();
-    }
+    if (onGoBack) onGoBack();
+    else window.history.back();
   };
 
+  // Guard: keep canvas below overlays
+  // (z-0 for canvas, z-40 for text, z-50 for buttons)
   return (
     <div className="relative flex flex-col bg-background w-full h-screen overflow-hidden text-foreground">
-      {/* 3D Scene */}
-      <div className="absolute inset-0 scene-container">
+      {/* 3D Scene (base layer) */}
+      <div className="z-0 absolute inset-0">
         <Canvas
+          className="w-full h-full"
           camera={{ position: [0, 0, 10], fov: 60 }}
           dpr={[1, 2]}
           performance={{ min: 0.5 }}
+          onPointerMissed={() => console.log("pointer missed canvas")}
         >
           <Suspense fallback={null}>
             <InteractiveScene onObjectClick={handleObjectClick} />
@@ -276,28 +264,26 @@ export const InteractiveNotFound: React.FC<InteractiveNotFoundProps> = ({
         </Canvas>
       </div>
 
-      {/* Content Overlay */}
-      <div className="z-10 relative flex flex-col flex-1 justify-center items-center p-6">
-        {/* Animated 404 Text */}
+      {/* Non-interactive content overlay (text + message) */}
+      <div className="z-40 absolute inset-0 flex flex-col justify-center items-center p-6 pointer-events-none">
         <motion.div
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: "easeOut" }}
-          className="mb-8 text-center"
+          className="mb-8 text-center pointer-events-none"
         >
-          <h1 className="font-black text-8xl md:text-9xl select-none holographic-text">
+          <h1 className="font-black text-8xl md:text-9xl pointer-events-none select-none holographic-text">
             404
           </h1>
-          <h2 className="mt-4 mb-2 font-bold text-2xl md:text-3xl">
-            Interactive Void
+          <h2 className="mt-4 mb-2 font-bold text-2xl md:text-3xl pointer-events-none">
+            Page Not Found
           </h2>
-          <p className="mx-auto max-w-md text-muted-foreground text-lg">
-            You&lsquo;ve entered an interactive dimension. Explore the floating
-            objects while you&lsquo;re here!
+          <p className="mx-auto max-w-md text-muted-foreground text-lg pointer-events-none">
+            Looks like you drifted into the void. Click the floating shards to
+            gather clues back home.
           </p>
         </motion.div>
 
-        {/* Interactive Message */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{
@@ -305,63 +291,63 @@ export const InteractiveNotFound: React.FC<InteractiveNotFoundProps> = ({
             scale: showMessage ? 1 : 0.8,
           }}
           transition={{ duration: 0.3 }}
-          className="flex items-center mb-8 h-16"
+          className="flex items-center mb-8 h-16 pointer-events-none"
         >
           {showMessage && (
-            <div className="bg-primary/10 backdrop-blur-sm px-6 py-3 border border-primary/20 rounded-lg">
+            <div className="bg-primary/10 backdrop-blur-sm px-6 py-3 border border-primary/20 rounded-lg pointer-events-auto">
               <p className="font-medium text-primary">{message}</p>
             </div>
           )}
         </motion.div>
+      </div>
 
-        {/* Action Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.5 }}
-          className="flex sm:flex-row flex-col gap-4"
-        >
+      {/* ACTION BUTTONS — isolated interactive layer (always clickable) */}
+      <div className="bottom-10 z-50 absolute inset-x-0 flex justify-center px-6">
+        <div className="flex sm:flex-row flex-col gap-4">
           <Button
+            type="button"
             onClick={handleGoHome}
+            onPointerDown={(e) => e.stopPropagation()}
+            onPointerUp={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
             className="group px-8 py-3 text-lg not-found-button"
+            style={{ pointerEvents: "auto" }} // hard override
           >
             <Home className="mr-2 w-5 h-5 group-hover:scale-110 transition-transform" />
             Return Home
           </Button>
 
           <Button
+            type="button"
             variant="outline"
             onClick={handleGoBack}
+            onPointerDown={(e) => e.stopPropagation()}
+            onPointerUp={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
             className="group px-8 py-3 text-lg not-found-button"
+            style={{ pointerEvents: "auto" }}
           >
             <ArrowLeft className="mr-2 w-5 h-5 transition-transform group-hover:-translate-x-1" />
             Go Back
           </Button>
 
           <Button
+            type="button"
             variant="ghost"
             onClick={() => window.location.reload()}
+            onPointerDown={(e) => e.stopPropagation()}
+            onPointerUp={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
             className="group px-6 py-3 not-found-button"
+            style={{ pointerEvents: "auto" }}
           >
             <RotateCcw className="mr-2 w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
             Refresh
           </Button>
-        </motion.div>
-
-        {/* Instructions */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 1 }}
-          className="mt-8 text-muted-foreground text-sm text-center"
-        >
-          <p>
-            Move your mouse around and click the floating objects to interact!
-          </p>
-        </motion.div>
+        </div>
       </div>
 
-      {/* Cyber Grid Background */}
+      {/* Cyber Grid Background (non-interactive) */}
       <div className="absolute inset-0 cyber-grid opacity-30 pointer-events-none" />
     </div>
   );

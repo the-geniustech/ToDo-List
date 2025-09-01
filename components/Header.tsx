@@ -108,7 +108,7 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Profile */}
           <div className="bg-muted rounded-full w-9 h-9 overflow-hidden">
             <ImageWithFallback
-              src="/api/placeholder/36/36"
+              src="/img/user-1.png"
               alt="Profile"
               className="w-full h-full object-cover"
             />
