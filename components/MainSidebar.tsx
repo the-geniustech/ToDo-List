@@ -294,31 +294,19 @@ export function MainSidebar() {
 
       {/* Navigation Items */}
       <div className="flex flex-col flex-1 justify-start space-y-2 px-4 pt-8">
-        {navigationItems.map((item) => {
-          console.log(
-            "pathName.includes(item.id) || pathName === '/'",
-            pathName.includes(item.id) || pathName === "/"
-          );
-
-          console.log("pathName === '/'", pathName === "/");
-          console.log("pathName.includes(item.id)", pathName.includes(item.id));
-          console.log("pathName", pathName);
-          console.log("item.id", item.id);
-
-          return (
-            <NavItem
-              key={item.id}
-              icon={item.icon}
-              isActive={
-                pathName.startsWith(`/${item.id}`) ||
-                (pathName === "/" && item.id === "dashboard")
-              }
-              // isActive={activeItem === item.id}
-              onClick={() => route.push(item.link)}
-              tooltip={item.tooltip}
-            />
-          );
-        })}
+        {navigationItems.map((item) => (
+          <NavItem
+            key={item.id}
+            icon={item.icon}
+            isActive={
+              pathName.startsWith(item.link) ||
+              (pathName === "/" && item.id === "dashboard")
+            }
+            // isActive={activeItem === item.id}
+            onClick={() => route.push(item.link)}
+            tooltip={item.tooltip}
+          />
+        ))}
       </div>
 
       {/* Logout Button */}
