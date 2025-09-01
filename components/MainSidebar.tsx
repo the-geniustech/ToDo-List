@@ -206,6 +206,22 @@ interface NavItemProps {
   tooltip?: string;
 }
 
+/**
+ * Determine if a sidebar item should be marked active based on current path.
+ *
+ * @param currentPath - The current Next.js pathname (from usePathname()).
+ * @param itemLink - The navigation item's link path.
+ */
+export function isActiveLink(currentPath: string, itemLink: string): boolean {
+  if (itemLink === "/") {
+    // Dashboard should only be active on root
+    return currentPath === "/";
+  }
+
+  // Match exact link or subpaths (e.g. /profile/settings under /profile)
+  return currentPath === itemLink || currentPath.startsWith(itemLink + "/");
+}
+
 function NavItem({ icon, isActive = false, onClick, tooltip }: NavItemProps) {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -298,10 +314,11 @@ export function MainSidebar() {
           <NavItem
             key={item.id}
             icon={item.icon}
-            isActive={
-              pathName.startsWith(item.link) ||
-              (pathName === "/" && item.id === "dashboard")
-            }
+            isActive={isActiveLink(pathName, item.link)}
+            // isActive={
+            //   pathName.startsWith(item.link) ||
+            //   (pathName === "/" && item.id === "dashboard")
+            // }
             // isActive={activeItem === item.id}
             onClick={() => route.push(item.link)}
             tooltip={item.tooltip}
