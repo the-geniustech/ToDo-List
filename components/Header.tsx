@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { ImageWithFallback } from "@/components/ui/ImageWithFallback";
-import { ProjectModal } from "./ProjectModal";
 import { FilterSortModal, FilterSortOptions } from "./FilterSortModal";
 import { TemplateModal } from "./TemplateModal";
 import { useTaskContext } from "./TaskContext";
@@ -21,6 +20,7 @@ import { useTeamContext } from "./TeamContext";
 interface HeaderProps {
   onFilterSort?: (options: FilterSortOptions) => void;
   currentFilterSort?: FilterSortOptions;
+  onOpenCreateEditProjectModal: () => void;
 }
 
 const defaultFilterSort: FilterSortOptions = {
@@ -36,12 +36,12 @@ const defaultFilterSort: FilterSortOptions = {
 export const Header: React.FC<HeaderProps> = ({
   onFilterSort,
   currentFilterSort = defaultFilterSort,
+  onOpenCreateEditProjectModal,
 }) => {
   const { tasks } = useTaskContext();
   const { teamMembers } = useTeamContext();
 
   // Modal states
-  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
 
@@ -134,7 +134,7 @@ export const Header: React.FC<HeaderProps> = ({
 
               <button
                 className="flex items-center gap-2 pb-2 font-medium text-muted-foreground hover:text-foreground theme-transition"
-                onClick={() => setIsProjectModalOpen(true)}
+                onClick={onOpenCreateEditProjectModal}
               >
                 <Plus className="w-4 h-4" />
                 Add view
@@ -174,12 +174,6 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
       </div>
-
-      {/* Modals */}
-      <ProjectModal
-        isOpen={isProjectModalOpen}
-        onClose={() => setIsProjectModalOpen(false)}
-      />
 
       <FilterSortModal
         isOpen={isFilterModalOpen}

@@ -32,7 +32,11 @@ interface NavItem {
   hasSubmenu: boolean;
 }
 
-export function ProjectSidebar() {
+export function ProjectSidebar({
+  onOpenCreateEditProjectModal,
+}: {
+  onOpenCreateEditProjectModal: () => void;
+}) {
   const {
     projects,
     currentProjectId,
@@ -189,7 +193,10 @@ export function ProjectSidebar() {
               Workspace Overview
             </p>
           </div>
-          <button className="hover:bg-sidebar-accent p-2 rounded-lg transition-colors">
+          <button
+            onClick={onOpenCreateEditProjectModal}
+            className="hover:bg-sidebar-accent p-2 rounded-lg transition-colors"
+          >
             <Plus size={20} className="text-muted-foreground" />
           </button>
         </div>
